@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+	<title>Document</title>
+</head>
+<body>
+	<div class="events">
+		<p>
+			<input type="text" class="input1"/>
+			<button class="btn" data-name="xky" data-otherName="cyt">确定</button>
+		</p>
+		<p>
+			<input type="text" class="input2"/>
+			<button class="btn" data-name="cyt" data-otherName="xky">确定</button>
+		</p>
+		<p>
+			<input type="text" class="input3"/>
+			<button class="btn" data-name="love" data-otherName="you">确定</button>
+		</p>
+		<p>
+			<input type="text" class="input4"/>
+			<button class="btn" data-name="you" data-otherName="love">确定</button>
+		</p>
+	</div>
+</body>
+<script>
+	var events = {
+		obj:[],
+		emit:function(str,isif,data){
+			for(var i=0;i<this.obj.length;i++){
+				if(isif != this.obj[i].name){
+					this.obj[i].change && this.obj[i].change(str,data)
+					break;
+				}
+			}
+		},
+		addListener:function(obj){
+			this.obj.push(obj)
+		}
+	}
+	var obj1 = {
+		name:'xky',
+		change:function(str,data){
+			console.log(str,data)
+		}
+	}
+	events.addListener(obj1)
+	var obj2 = {
+		name:'cyt',
+		change:function(str,data){
+			console.log(str,data)
+		}
+	}
+	events.addListener(obj2)
+	var obj3 = {
+		name:'love',
+		change:function(str,data){
+			console.log(str,data)
+		}
+	}
+	events.addListener(obj3)
+	var obj4 = {
+		name:'you',
+		change:function(str,data){
+			console.log(str,data)
+		}
+	}
+	events.addListener(obj4)
+	
+	
+	var djevents = document.getElementsByClassName('events')[0];
+	djevents.addEventListener('click',function(e){
+		var evt = e || window.event;
+		if(evt.target.className == 'btn'){
+			var btn = document.getElementsByClassName('btn');
+			var str = ''
+			for(var i=0;i<btn.length;i++){
+				if(btn[i].dataset.name == evt.target.dataset.name){
+					continue;
+				}
+				str+=btn[i].previousElementSibling.className+'无动静,'
+			}
+			str = str.slice(0,str.length-1)
+			events.emit(str,evt.target.dataset.othername,evt.target.previousElementSibling.className+'触发')
+		}
+	})
+</script>
+</html>
