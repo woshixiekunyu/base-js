@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<style>
+		*{
+			padding: 0;
+			margin: 0;
+		}
+		a{
+			text-decoration: none;
+		}
+		ul,li{
+			list-style: none;
+		}
+		input{
+			outline: none;
+		}
+		body{
+			width: 1100px;
+			margin: 0 auto;
+		}
+		.show_dm{
+			width: 800px;
+			height: 400px;
+			/*margin: 0 auto;*/
+			border: 1px solid #ccc;
+			background-color: #f2f2f2;
+			position: relative;
+			overflow: hidden;
+		}
+		.show_dm .dm-item{
+			position: absolute;
+			right: -100%;
+			white-space: nowrap;
+		}
+		.input_dm{
+			width: 800px;
+			margin: 0 auto;
+		}
+		.input_dm textarea{
+			outline: none;
+		    resize: none;
+		    width: 798px;
+		    height: 150px;
+		    font-size: 16px;
+		    display: block;
+		    border: 1px solid #ccc;
+		    padding-left: 1px;
+		}
+		.input_dm input{
+			width: 800px;
+			height: 50px;
+			font-size: 20px;
+		}
+		.left{
+			float: left;
+		}
+		.right{
+			float: left;
+			width: 277px;
+			height: 582px;
+			border: 1px solid #ccc;
+			border-left: 0;
+			overflow: hidden;
+			overflow-x: hidden;
+			overflow-y: scroll;
+			padding: 10px;
+		}
+		.right .dm-item{
+			line-height: 30px;
+		}
+		::-webkit-scrollbar{
+		  display:none;
+		}
+	</style>
+	<body>
+		<div class="left">
+			<div class="show_dm">
+			</div>
+			<div class="input_dm">
+				<textarea name="inputVal" rows="" cols="" placeholder="请输入内容"></textarea>
+				<input type="button" class="cmt" value="发 送" />
+			</div>
+		</div>
+		<div class="right">
+			
+		</div>
+	</body>
+	<script>
+		class danmu {
+			constructor(){
+				this.move = 'left';
+				this.msgList = localStorage.getItem('myMsg')?JSON.parse(localStorage.getItem('myMsg')):[];
+				this.startNum = 0;
+				this.dttimer = null;
+				this.alltimer = null
+				this.t = this.random(16,this.showH-16)
+				this.s = this.random(0,20)
+			};
+			random(min,max){
+				return Math.floor(Math.random()*(max-min+1)+min)
+			};
+			randomColor(){
+				var color = '#';
+				for(var i=0;i<6;i++){
+					color +=  '0123456789abcdef'[Math.floor(Math.random()*16)]
+				}
+			    return color
+			}
+		};
+		danmu.prototype.init = function(){
+			var btn = document.getElementsByClassName('cmt')[0];
+			var showArea = document.getElementsByClassName('show_dm')[0];
+			var rArea = document.getElementsByClassName('right')[0];
+			var showH = showArea.offsetHeight;
+			var showW = showArea.offsetWidth;
+			this.btn = btn;
+			this.showArea = showArea;
+			this.showH = showH;
+			this.showW = showW;
+//			this.initdom()
+			this.scrollB(rArea)
+			
+			
+			this.btn.onclick = e=>{
+				this.t = this.random(16,this.showH-16)
+				var msg = document.getElementsByName('inputVal')[0];
+				if(msg.value == ''){
+					msg.focus()
+					return
+				}else if(msg.value.length>20){
+					msg.focus()
+					return
+				}
+				var c = this.randomColor();
+				var evt = e ||window.event;
+				var cdiv = document.createElement('div');
+				cdiv.className = 'dm-item';
+				cdiv.innerText = msg.value;
+				cdiv.style.color = c;
+				cdiv.style.top = this.t + 'px'
+				
+				var cdivs = document.createElement('div');
+				cdivs.className = 'dm-item';
+				cdivs.innerText = msg.value;
+				rArea.appendChild(cdivs);
+				this.scrollB(rArea)
+				var listobj = {
+					color:c,
+					value:msg.value,
+					classname:'dm-item'
+				}
+				msg.value = '';
+				this.msgList.push(listobj);
+				var msgList = JSON.stringify(this.msgList);
+				localStorage.setItem('myMsg',msgList)
+				showArea.appendChild(cdiv);
+				this.dmmove(cdiv)
+				msg.focus()
+			}
+//			showArea.onmousemove = ()=>{
+//				console.log(1)
+//				clearTimeout(this.dttimer);
+//			}
+//			showArea.onmouseout = ()=>{
+//				this.allmove(1);
+//			}
+		};
+		danmu.prototype.scrollB = function(dom){
+			dom.scrollTop = dom.scrollHeight;
+			console.log(dom.scrollTop)
+		};
+		danmu.prototype.dmmove = function(dom){
+//			console.log(dom)
+//			clearInterval(this.dttimer)
+			var r = -100
+			this.dttimer = setInterval(()=>{
+				this.s = this.random(0,50)
+				r++;
+				if(r >= 100){
+					dom.parentElement&&dom.parentElement.removeChild(dom)
+//					clearInterval(this.dttimer)
+					return
+				}
+				dom.style.right = r + '%'
+			},this.s)
+		};
+//		danmu.prototype.initdom = function(){
+//			var list = localStorage.getItem('myMsg');
+//			list = JSON.parse(list);
+//			console.log(list)
+//			list.forEach((item,idx)=>{
+//				var random = this.random(16,this.showH-30)
+//				var cdiv = document.createElement('div');
+//				cdiv.style.top = random+'px';
+//				cdiv.style.color = item.color;
+//				cdiv.className = item.classname;
+//				cdiv.innerText = item.value;
+//				this.showArea.appendChild(cdiv)
+//			})
+//			this.allmove(1)
+//		}
+//		danmu.prototype.allmove = function(s){
+//			this.alltimer = setTimeout(()=>{
+//				var s = this.random(0,200);
+//				if(this.startNum>=this.showArea.children.length){
+//					clearTimeout(this.alltimer);
+//					return
+//				}
+//				this.dmmove(this.showArea.children[this.startNum])
+//				this.allmove(s)
+//				this.startNum++;
+//			},s)
+//		}
+		var d = new danmu();
+		d.init()
+	</script>
+</html>
